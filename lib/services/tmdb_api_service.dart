@@ -7,7 +7,7 @@ import '../models/api_search_result.dart';
 class TmdbApiService {
   /// Masukkan TMDB API Key v3 Anda di sini jika tidak di-pass lewat konstruktor.
   /// Dapatkan gratis di: https://www.themoviedb.org/settings/api
-  static const String defaultApiKey = '';
+  static const String defaultApiKey = '6fc770e80af55f4982a911f3a8699553';
 
   final String apiKey;
   final http.Client _client;
