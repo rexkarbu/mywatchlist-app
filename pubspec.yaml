@@ -26,12 +26,14 @@ dev_dependencies:
   flutter_lints: ^6.0.0
   build_runner: ^2.4.14
   isar_community_generator: ^3.3.2
+  flutter_launcher_icons: ^0.14.3
 
 flutter:
   uses-material-design: true
 
   assets:
     - assets/fonts/
+    - assets/icon.png
 
   fonts:
     - family: Inter
@@ -44,3 +46,8 @@ flutter:
           weight: 600
         - asset: assets/fonts/Inter-Bold.ttf
           weight: 700
+
+flutter_icons:
+  android: "launcher_icon"
+  ios: false
+  image_path: "assets/icon.png"
