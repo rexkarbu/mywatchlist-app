@@ -91,6 +91,8 @@ class StatsScreen extends ConsumerWidget {
           _buildCategoryCard(context, stats.movie),
           const SizedBox(height: 10),
           _buildCategoryCard(context, stats.series),
+          const SizedBox(height: 10),
+          _buildCategoryCard(context, stats.reading),
 
           const SizedBox(height: 28),
 
@@ -283,6 +285,9 @@ class StatsScreen extends ConsumerWidget {
       case ItemType.series:
         icon = Icons.tv_rounded;
         break;
+      case ItemType.reading:
+        icon = Icons.auto_stories_rounded;
+        break;
     }
 
     return Card(
@@ -450,7 +455,9 @@ class StatsScreen extends ConsumerWidget {
                                 ? Icons.animation_rounded
                                 : item.type == ItemType.movie
                                 ? Icons.movie_rounded
-                                : Icons.tv_rounded,
+                                : item.type == ItemType.series
+                                ? Icons.tv_rounded
+                                : Icons.auto_stories_rounded,
                             color: Colors.white.withValues(alpha: 0.3),
                             size: 28,
                           ),
@@ -478,8 +485,8 @@ class StatsScreen extends ConsumerWidget {
                       const SizedBox(height: 4),
                       Text(
                         item.progressTotal != null
-                            ? '${item.progressCurrent}/${item.progressTotal} ep'
-                            : '${item.progressCurrent} ep',
+                            ? '${item.progressCurrent}/${item.progressTotal} ${item.type == ItemType.reading ? 'ch' : 'ep'}'
+                            : '${item.progressCurrent} ${item.type == ItemType.reading ? 'ch' : 'ep'}',
                         style: theme.textTheme.bodySmall?.copyWith(
                           color: theme.colorScheme.primary,
                           fontWeight: FontWeight.w500,

@@ -132,7 +132,7 @@ class PosterGridItem extends StatelessWidget {
                     child: Text(
                       item.progressTotal != null
                           ? '${item.progressCurrent}/${item.progressTotal}'
-                          : '${item.progressCurrent} ep',
+                          : '${item.progressCurrent} ${item.type == ItemType.reading ? 'ch' : 'ep'}',
                       style: const TextStyle(
                         color: Colors.white70,
                         fontSize: 10,
@@ -214,6 +214,8 @@ class PosterGridItem extends StatelessWidget {
         return Icons.movie_rounded;
       case ItemType.series:
         return Icons.tv_rounded;
+      case ItemType.reading:
+        return Icons.auto_stories_rounded;
     }
   }
 }

@@ -5,12 +5,12 @@ import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 
 import 'package:my_watchlist/models/api_search_result.dart';
-import 'package:my_watchlist/services/jikan_api_service.dart';
+import 'package:my_watchlist/services/anilist_api_service.dart';
 import 'package:my_watchlist/services/tmdb_api_service.dart';
 
 void main() {
   group('ApiSearchResult Model', () {
-    test('properti terisi dengan benar', () {
+    test('properti terisi dengan benar termasuk format', () {
       const result = ApiSearchResult(
         title: 'Frieren: Beyond Journey\'s End',
         year: 2023,
@@ -18,6 +18,7 @@ void main() {
         posterUrl: 'https://example.com/poster.jpg',
         totalEpisodes: 28,
         synopsis: 'Petualangan Frieren...',
+        format: 'TV',
       );
 
       expect(result.title, 'Frieren: Beyond Journey\'s End');
@@ -26,94 +27,118 @@ void main() {
       expect(result.posterUrl, 'https://example.com/poster.jpg');
       expect(result.totalEpisodes, 28);
       expect(result.synopsis, 'Petualangan Frieren...');
+      expect(result.format, 'TV');
     });
   });
 
-  group('JikanApiService', () {
+  group('AniListApiService', () {
     test('query kosong mengembalikan list kosong', () async {
-      final service = JikanApiService();
-      final results = await service.searchAnime('   ');
-      expect(results, isEmpty);
+      final service = AniListApiService();
+      final animeResults = await service.searchAnime('   ');
+      final readingResults = await service.searchReading('   ');
+      expect(animeResults, isEmpty);
+      expect(readingResults, isEmpty);
     });
 
-    test('parsing respons Jikan v4 berhasil memetakan semua bidang', () async {
+    test('searchAnime memetakan data GraphQL Anime dengan benar dan membersihkan tag HTML', () async {
       final mockJson = {
-        'data': [
-          {
-            'title': 'Sousou no Frieren',
-            'title_english': 'Frieren: Beyond Journey\'s End',
-            'year': 2023,
-            'episodes': 28,
-            'synopsis': 'The anime adaptation of Frieren.',
-            'genres': [
-              {'name': 'Adventure'},
-              {'name': 'Fantasy'},
-            ],
-            'themes': [
-              {'name': 'Time'},
-            ],
-            'images': {
-              'jpg': {
-                'image_url':
-                    'https://cdn.myanimelist.net/images/anime/4/84155.jpg',
-                'large_image_url':
-                    'https://cdn.myanimelist.net/images/anime/4/84155l.jpg',
+        'data': {
+          'Page': {
+            'media': [
+              {
+                'id': 116589,
+                'title': {
+                  'romaji': '86: Eighty Six',
+                  'english': '86 EIGHTY-SIX',
+                  'native': '86―エイティシックス―',
+                },
+                'startDate': {'year': 2021},
+                'genres': ['Action', 'Drama', 'Mecha', 'Sci-Fi'],
+                'episodes': 11,
+                'format': 'TV',
+                'coverImage': {
+                  'large': 'https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx116589.jpg',
+                },
+                'description': 'Called <i>Juggernaut</i>.<br><br>Shin fights...',
               },
-            },
+            ],
           },
-        ],
+        },
       };
 
       final client = MockClient((request) async {
-        expect(request.url.host, 'api.jikan.moe');
-        expect(request.url.path, '/v4/anime');
-        return http.Response(jsonEncode(mockJson), 200);
+        expect(request.url.host, 'graphql.anilist.co');
+        final body = jsonDecode(request.body) as Map<String, dynamic>;
+        expect(body['variables']['search'], '86');
+        return http.Response.bytes(
+          utf8.encode(jsonEncode(mockJson)),
+          200,
+          headers: {'content-type': 'application/json; charset=utf-8'},
+        );
       });
 
-      final service = JikanApiService(client: client);
-      final results = await service.searchAnime('frieren');
+      final service = AniListApiService(client: client);
+      final results = await service.searchAnime('86');
 
       expect(results.length, 1);
       final item = results.first;
-      expect(item.title, 'Frieren: Beyond Journey\'s End');
-      expect(item.year, 2023);
-      expect(item.totalEpisodes, 28);
-      expect(item.genres, ['Adventure', 'Fantasy', 'Time']);
-      expect(
-        item.posterUrl,
-        'https://cdn.myanimelist.net/images/anime/4/84155l.jpg',
-      );
-      expect(item.synopsis, 'The anime adaptation of Frieren.');
+      expect(item.title, '86 EIGHTY-SIX');
+      expect(item.year, 2021);
+      expect(item.genres, ['Action', 'Drama', 'Mecha', 'Sci-Fi']);
+      expect(item.totalEpisodes, 11);
+      expect(item.format, 'TV');
+      expect(item.posterUrl, 'https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx116589.jpg');
+      expect(item.synopsis, 'Called Juggernaut.\n\nShin fights...');
     });
 
-    test('fallback ke aired.prop.from.year jika year bernilai null', () async {
+    test('searchReading memetakan chapters, volumes, dan format', () async {
       final mockJson = {
-        'data': [
-          {
-            'title': 'Classic Anime',
-            'title_english': null,
-            'year': null,
-            'aired': {
-              'prop': {
-                'from': {'year': 1998},
+        'data': {
+          'Page': {
+            'media': [
+              {
+                'id': 105398,
+                'title': {
+                  'romaji': 'Na Honjaman Level Up',
+                  'english': 'Solo Leveling',
+                  'native': '나 혼자만 레벨업',
+                },
+                'startDate': {'year': 2018},
+                'genres': ['Action', 'Adventure', 'Fantasy'],
+                'chapters': 201,
+                'volumes': 15,
+                'format': 'MANGA',
+                'coverImage': {
+                  'large': 'https://s4.anilist.co/file/anilistcdn/media/manga/cover/medium/bx105398.jpg',
+                },
+                'description': 'Hunters fight monsters.',
               },
-            },
-            'genres': [],
-            'images': null,
+            ],
           },
-        ],
+        },
       };
 
       final client = MockClient((request) async {
-        return http.Response(jsonEncode(mockJson), 200);
+        expect(request.url.host, 'graphql.anilist.co');
+        return http.Response.bytes(
+          utf8.encode(jsonEncode(mockJson)),
+          200,
+          headers: {'content-type': 'application/json; charset=utf-8'},
+        );
       });
 
-      final service = JikanApiService(client: client);
-      final results = await service.searchAnime('classic');
+      final service = AniListApiService(client: client);
+      final results = await service.searchReading('Solo Leveling');
 
-      expect(results.first.title, 'Classic Anime');
-      expect(results.first.year, 1998);
-      expect(results.first.posterUrl, isNull);
+      expect(results.length, 1);
+      final item = results.first;
+      expect(item.title, 'Solo Leveling');
+      expect(item.year, 2018);
+      expect(item.genres, ['Action', 'Adventure', 'Fantasy']);
+      expect(item.totalEpisodes, 201); // chapters di-map ke totalEpisodes
+      expect(item.format, 'MANGA');
+      expect(item.posterUrl, 'https://s4.anilist.co/file/anilistcdn/media/manga/cover/medium/bx105398.jpg');
+      expect(item.synopsis, 'Hunters fight monsters.');
     });
   });
 

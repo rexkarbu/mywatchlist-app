@@ -209,6 +209,8 @@ class _CollectionScreenState extends ConsumerState<CollectionScreen> {
         return Icons.movie_rounded;
       case ItemType.series:
         return Icons.tv_rounded;
+      case ItemType.reading:
+        return Icons.auto_stories_rounded;
     }
   }
 }

@@ -4,10 +4,10 @@ import 'package:flutter/material.dart';
 
 import '../models/api_search_result.dart';
 import '../models/enums.dart';
-import '../services/jikan_api_service.dart';
+import '../services/anilist_api_service.dart';
 import '../services/tmdb_api_service.dart';
 
-/// Modal bottom sheet untuk mencari metadata tontonan secara online (Jikan & TMDB).
+/// Modal bottom sheet untuk mencari metadata secara online (AniList & TMDB).
 class ApiSearchDialog extends StatefulWidget {
   final ItemType type;
   final String? initialQuery;
@@ -34,7 +34,7 @@ class ApiSearchDialog extends StatefulWidget {
 
 class _ApiSearchDialogState extends State<ApiSearchDialog> {
   late final TextEditingController _controller;
-  final JikanApiService _jikanService = JikanApiService();
+  final AniListApiService _anilistService = AniListApiService();
   final TmdbApiService _tmdbService = TmdbApiService();
 
   Timer? _debounce;
@@ -91,7 +91,10 @@ class _ApiSearchDialogState extends State<ApiSearchDialog> {
       List<ApiSearchResult> items;
       switch (widget.type) {
         case ItemType.anime:
-          items = await _jikanService.searchAnime(query);
+          items = await _anilistService.searchAnime(query);
+          break;
+        case ItemType.reading:
+          items = await _anilistService.searchReading(query);
           break;
         case ItemType.movie:
           items = await _tmdbService.searchMovie(query);
@@ -285,8 +288,8 @@ class _ApiSearchDialogState extends State<ApiSearchDialog> {
             ),
             const SizedBox(height: 4),
             Text(
-              widget.type == ItemType.anime
-                  ? 'Sumber data: Jikan API (MyAnimeList)'
+              (widget.type == ItemType.anime || widget.type == ItemType.reading)
+                  ? 'Sumber data: AniList API'
                   : 'Sumber data: The Movie Database (TMDB)',
               style: theme.textTheme.bodySmall?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant.withValues(
@@ -409,9 +412,29 @@ class _ApiSearchDialogState extends State<ApiSearchDialog> {
                               borderRadius: BorderRadius.circular(4),
                             ),
                             child: Text(
-                              '${item.totalEpisodes} eps',
+                              '${item.totalEpisodes} ${widget.type.progressUnit.toLowerCase()}',
                               style: theme.textTheme.labelSmall?.copyWith(
                                 color: theme.colorScheme.onPrimaryContainer,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+                        ],
+                        if (item.format != null) ...[
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 6,
+                              vertical: 2,
+                            ),
+                            decoration: BoxDecoration(
+                              color: theme.colorScheme.secondaryContainer,
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: Text(
+                              item.format!,
+                              style: theme.textTheme.labelSmall?.copyWith(
+                                color: theme.colorScheme.onSecondaryContainer,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),

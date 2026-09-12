@@ -389,18 +389,25 @@ class _AddEditScreenState extends ConsumerState<AddEditScreen> {
             ),
             const SizedBox(height: 20),
 
-            // Progress (anime/series only).
+            // Progress (anime/series/reading).
             if (widget.type.hasProgress) ...[
-              Text('Progress Episode', style: theme.textTheme.labelLarge),
+              Text(
+                'Progress ${widget.type.progressUnit}',
+                style: theme.textTheme.labelLarge,
+              ),
               const SizedBox(height: 8),
               Row(
                 children: [
                   Expanded(
                     child: TextFormField(
                       controller: _progressCurrentController,
-                      decoration: const InputDecoration(
-                        labelText: 'Episode saat ini',
-                        prefixIcon: Icon(Icons.play_arrow_rounded),
+                      decoration: InputDecoration(
+                        labelText: '${widget.type.progressUnit} saat ini',
+                        prefixIcon: Icon(
+                          widget.type == ItemType.reading
+                              ? Icons.menu_book_rounded
+                              : Icons.play_arrow_rounded,
+                        ),
                       ),
                       keyboardType: TextInputType.number,
                       validator: (value) {
@@ -427,9 +434,9 @@ class _AddEditScreenState extends ConsumerState<AddEditScreen> {
                   Expanded(
                     child: TextFormField(
                       controller: _progressTotalController,
-                      decoration: const InputDecoration(
-                        labelText: 'Total (opsional)',
-                        prefixIcon: Icon(Icons.format_list_numbered_rounded),
+                      decoration: InputDecoration(
+                        labelText: 'Total ${widget.type.progressUnit} (opsional)',
+                        prefixIcon: const Icon(Icons.format_list_numbered_rounded),
                       ),
                       keyboardType: TextInputType.number,
                       validator: (value) {

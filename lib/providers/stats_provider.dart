@@ -29,21 +29,28 @@ class AllStats {
   final CategoryStats anime;
   final CategoryStats movie;
   final CategoryStats series;
+  final CategoryStats reading;
   final List<WatchItem> currentlyWatching;
 
   const AllStats({
     required this.anime,
     required this.movie,
     required this.series,
+    required this.reading,
     required this.currentlyWatching,
   });
 
-  int get totalAll => anime.total + movie.total + series.total;
+  int get totalAll =>
+      anime.total + movie.total + series.total + reading.total;
   int get totalCompleted =>
-      anime.completed + movie.completed + series.completed;
-  int get totalWatching => anime.watching + movie.watching + series.watching;
+      anime.completed + movie.completed + series.completed + reading.completed;
+  int get totalWatching =>
+      anime.watching + movie.watching + series.watching + reading.watching;
   int get totalPlanToWatch =>
-      anime.planToWatch + movie.planToWatch + series.planToWatch;
+      anime.planToWatch +
+      movie.planToWatch +
+      series.planToWatch +
+      reading.planToWatch;
 }
 
 /// Provider untuk statistik lengkap. FutureProvider agar bisa loading/error.
@@ -55,6 +62,7 @@ final statsProvider = FutureProvider<AllStats>((ref) async {
     _fetchCategoryStats(repo, ItemType.anime),
     _fetchCategoryStats(repo, ItemType.movie),
     _fetchCategoryStats(repo, ItemType.series),
+    _fetchCategoryStats(repo, ItemType.reading),
     repo.getCurrentlyWatching(),
   ]);
 
@@ -62,7 +70,8 @@ final statsProvider = FutureProvider<AllStats>((ref) async {
     anime: results[0] as CategoryStats,
     movie: results[1] as CategoryStats,
     series: results[2] as CategoryStats,
-    currentlyWatching: results[3] as List<WatchItem>,
+    reading: results[3] as CategoryStats,
+    currentlyWatching: results[4] as List<WatchItem>,
   );
 });
 

@@ -4,7 +4,7 @@ import '../models/enums.dart';
 import 'collection_screen.dart';
 import 'stats_screen.dart';
 
-/// Home screen dengan bottom navigation — 4 tab: Anime, Film, Series, Stats.
+/// Home screen dengan bottom navigation — 5 tab: Anime, Film, Series, Reading, Stats.
 /// Menggunakan IndexedStack untuk mempertahankan state dan scroll position per tab.
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -21,6 +21,7 @@ class _HomeScreenState extends State<HomeScreen> {
     CollectionScreen(key: PageStorageKey('anime'), type: ItemType.anime),
     CollectionScreen(key: PageStorageKey('movie'), type: ItemType.movie),
     CollectionScreen(key: PageStorageKey('series'), type: ItemType.series),
+    CollectionScreen(key: PageStorageKey('reading'), type: ItemType.reading),
     StatsScreen(key: PageStorageKey('stats')),
   ];
 
@@ -48,6 +49,11 @@ class _HomeScreenState extends State<HomeScreen> {
             icon: Icon(Icons.tv_outlined),
             selectedIcon: Icon(Icons.tv_rounded),
             label: 'Series',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.auto_stories_outlined),
+            selectedIcon: Icon(Icons.auto_stories_rounded),
+            label: 'Reading',
           ),
           NavigationDestination(
             icon: Icon(Icons.bar_chart_outlined),

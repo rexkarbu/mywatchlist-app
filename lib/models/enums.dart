@@ -1,8 +1,9 @@
-/// Tipe koleksi tontonan.
+/// Tipe koleksi tontonan dan bacaan.
 enum ItemType {
   anime,
   movie,
-  series;
+  series,
+  reading;
 
   String get label {
     switch (this) {
@@ -12,11 +13,16 @@ enum ItemType {
         return 'Film';
       case ItemType.series:
         return 'Series';
+      case ItemType.reading:
+        return 'Reading';
     }
   }
 
-  /// Apakah tipe ini memiliki progress episode.
+  /// Apakah tipe ini memiliki progress (episode/chapter).
   bool get hasProgress => this != ItemType.movie;
+
+  /// Satuan unit progress.
+  String get progressUnit => this == ItemType.reading ? 'Chapter' : 'Episode';
 }
 
 /// Status tontonan.

@@ -265,11 +265,17 @@ const _WatchItemstatusValueEnumMap = {
   1: WatchStatus.watching,
   2: WatchStatus.completed,
 };
-const _WatchItemtypeEnumValueMap = {'anime': 0, 'movie': 1, 'series': 2};
+const _WatchItemtypeEnumValueMap = {
+  'anime': 0,
+  'movie': 1,
+  'series': 2,
+  'reading': 3,
+};
 const _WatchItemtypeValueEnumMap = {
   0: ItemType.anime,
   1: ItemType.movie,
   2: ItemType.series,
+  3: ItemType.reading,
 };
 
 Id _watchItemGetId(WatchItem object) {

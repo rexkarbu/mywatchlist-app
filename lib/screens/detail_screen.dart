@@ -177,9 +177,12 @@ class _DetailScreenState extends ConsumerState<DetailScreen> {
 
                   const SizedBox(height: 20),
 
-                  // Progress (anime/series).
+                  // Progress (anime/series/reading).
                   if (item.type.hasProgress) ...[
-                    Text('Progress Episode', style: theme.textTheme.labelLarge),
+                    Text(
+                      'Progress ${item.type.progressUnit}',
+                      style: theme.textTheme.labelLarge,
+                    ),
                     const SizedBox(height: 8),
                     _buildProgressSection(context, item, repo),
                     const SizedBox(height: 20),
@@ -355,7 +358,7 @@ class _DetailScreenState extends ConsumerState<DetailScreen> {
           )
         else
           Text(
-            ' ep',
+            ' ${item.type.progressUnit.toLowerCase()}',
             style: theme.textTheme.bodyLarge?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
             ),
